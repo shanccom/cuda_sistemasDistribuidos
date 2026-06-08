@@ -1,25 +1,36 @@
-# Dataset
+# Radiografías de tórax para benchmarking
 
-## Descripción
+Esta carpeta contiene las imágenes médicas usadas como entrada para los pipelines CPU y GPU.
 
-Esta carpeta contiene las imágenes médicas utilizadas para las pruebas de rendimiento.
+---
 
-## Contenido
+##  Contenido
 
-- Radiografías
-- Tomografías
-- Resonancias magnéticas
+```
+dataset/
+├── 00000001_000.png
+├── 00000001_001.png
+├── 00000001_002.png
+├── 00000002_000.png
+├── 00000003_000.png  ... (100 imágenes en total)
+└── README.md
+```
 
-## Formatos
+---
 
-- JPG
-- PNG
+##  Especificaciones técnicas
 
-## Uso
+| Atributo | Valor |
+|---|---|
+| Formato | PNG |
+| Resolución | 1024 × 1024 píxeles |
+| Total de imágenes | 100 radiografías |
 
-Las imágenes son utilizadas como entrada para los algoritmos de procesamiento en CPU y GPU.
+---
 
-## Fuente
+##  Origen del dataset
 
-Kaggle
-NIH Chest X-Ray Dataset
+Las imágenes provienen del **NIH ChestX-ray Dataset** , un dataset público de radiografías de tórax.
+
+- **Fuente:** [NIH Clinical Center](https://www.kaggle.com/datasets/nih-chest-xrays/data/data)
+

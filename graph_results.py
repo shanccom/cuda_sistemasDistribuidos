@@ -1,13 +1,8 @@
 """
-Generación de gráficas CPU vs GPU para el informe.
-Ejecutar desde la raíz del proyecto después de comparison.py.
-
 Gráficas generadas (en screenshots/):
   1. bar_times_per_operation.png  — tiempo promedio CPU vs GPU por operación
   2. speedup_per_operation.png    — speedup por operación (barras)
-  3. speedup_vs_megapixels.png    — speedup total vs tamaño de imagen
-  4. time_per_image.png           — tiempo total por imagen, CPU vs GPU
-  5. transfer_overhead.png        — desglose GPU: operación vs transferencia
+  3. transfer_overhead.png        — desglose GPU: operación vs transferencia
 """
 
 import os
@@ -112,7 +107,7 @@ def plot_speedup_ops(df):
 
     fig, ax = plt.subplots(figsize=(9, 5))
     bars = ax.barh(ops, speedups, color=colors, zorder=3)
-    ax.axvline(1.0, color="gray", linewidth=1.2, linestyle="--", label="Speedup = 1× (sin mejora)")
+    ax.axvline(1.0, color="gray", linewidth=1.2, linestyle="--", label="Speedup = 1×")
 
     for bar, val in zip(bars, speedups):
         ax.text(val + 0.05, bar.get_y() + bar.get_height()/2,
@@ -123,51 +118,7 @@ def plot_speedup_ops(df):
     ax.legend()
     save(fig, "speedup_per_operation.png")
 
-
-# ── Gráfica 3: Speedup vs tamaño de imagen ───────────────────────────────────
-def plot_speedup_vs_mp(df):
-    fig, ax = plt.subplots(figsize=(9, 5))
-    sc = ax.scatter(
-        df["megapixels"], df["speedup_total"],
-        color=C_GPU, edgecolors="white", linewidths=0.5,
-        s=80, zorder=3, label="Speedup por imagen"
-    )
-    # línea de tendencia
-    if len(df) >= 2:
-        z  = np.polyfit(df["megapixels"], df["speedup_total"], 1)
-        p  = np.poly1d(z)
-        xs = np.linspace(df["megapixels"].min(), df["megapixels"].max(), 100)
-        ax.plot(xs, p(xs), "--", color=C_SPEED, linewidth=1.5, label="Tendencia")
-
-    ax.axhline(1.0, color="gray", linewidth=1, linestyle="--")
-    ax.set_xlabel("Tamaño de imagen (megapíxeles)")
-    ax.set_ylabel("Speedup (GPU pura)")
-    ax.set_title("Speedup GPU vs tamaño de imagen")
-    ax.legend()
-    save(fig, "speedup_vs_megapixels.png")
-
-
-# ── Gráfica 4: Tiempo total por imagen ───────────────────────────────────────
-def plot_time_per_image(df):
-    df_sorted = df.sort_values("megapixels").reset_index(drop=True)
-    labels    = df_sorted["image"].str.replace(r"\.(png|jpg|jpeg)$", "", regex=True)
-    x         = np.arange(len(df_sorted))
-
-    fig, ax = plt.subplots(figsize=(max(8, len(df_sorted) * 0.7), 5))
-    ax.plot(x, ms(df_sorted["cpu_total"]), "o-", color=C_CPU, label="CPU", linewidth=2, markersize=5)
-    ax.plot(x, ms(df_sorted["gpu_total"]), "s-", color=C_GPU, label="GPU (sin transferencia)", linewidth=2, markersize=5)
-    ax.plot(x, ms(df_sorted["gpu_total_with_transfer"]), "^--", color=C_XFER,
-            label="GPU (con transferencia)", linewidth=1.5, markersize=5)
-
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
-    ax.set_ylabel("Tiempo total (ms)")
-    ax.set_title("Tiempo total de procesamiento por imagen")
-    ax.legend()
-    save(fig, "time_per_image.png")
-
-
-# ── Gráfica 5: Desglose GPU — operación vs transferencia ─────────────────────
+# ── Gráfica 3: Desglose GPU — operación vs transferencia ─────────────────────
 def plot_transfer_overhead(df):
     avg_op   = ms(df["gpu_total"]).mean()
     avg_xfer = ms(df["gpu_transfer"]).mean()
@@ -206,8 +157,6 @@ def main():
 
     plot_bar_times(df)
     plot_speedup_ops(df)
-    plot_speedup_vs_mp(df)
-    plot_time_per_image(df)
     plot_transfer_overhead(df)
 
     print(f"\nTodas las gráficas guardadas en: {SCREENSHOTS_DIR}/")
