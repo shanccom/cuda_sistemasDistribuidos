@@ -2,3 +2,5 @@ numpy
 pandas
 Pillow
 matplotlib
+scipy
+cupy-cuda12x[ctk]
