@@ -1,5 +1,5 @@
 """
-Procesamiento de imágenes médicas - CPU (versión de referencia)
+Procesamiento de imágenes médicas - CPU
 Operaciones: inversión, filtro gaussiano, ecualización de histograma
 """
 
@@ -12,11 +12,16 @@ from scipy.ndimage import gaussian_filter
 
 DATASET_DIR = os.path.join(os.path.dirname(__file__), "../dataset")
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), "../results")
-REPETITIONS = 5  # promedio de N ejecuciones para estabilizar la medición
+# promedio de N ejecuciones para reducir ruido en la medición
+REPETITIONS = 5
+
+# Para guardar resultados de algunas imágenes
+SAMPLES_DIR = os.path.join(os.path.dirname(__file__), "../samples")
+NUM_SAMPLES = 1
 
 
 def invert_image(img: np.ndarray) -> np.ndarray:
-    """Inversión de píxeles (negativo radiológico)."""
+    """Inversión de píxeles (negativo)."""
     return np.subtract(255, img, dtype=np.uint8)
 
 
@@ -38,7 +43,7 @@ def equalize_histogram(img: np.ndarray) -> np.ndarray:
 
 
 def measure(fn, *args, reps=REPETITIONS):
-    """Ejecuta fn(*args) `reps` veces y devuelve el tiempo promedio en segundos."""
+    """Ejecuta fn(*args) 'reps' veces y devuelve el tiempo promedio en segundos."""
     times = []
     for _ in range(reps):
         start = time.perf_counter()
@@ -71,6 +76,15 @@ def main():
         t_inv,  _ = measure(invert_image,     img)
         t_gaus, _ = measure(gaussian_blur,    img)
         t_hist, _ = measure(equalize_histogram, img)
+
+        count = 0
+        if count < NUM_SAMPLES:
+            os.makedirs(SAMPLES_DIR, exist_ok=True)
+            n = count + 1
+            Image.fromarray(invert_image(img)).save(os.path.join(SAMPLES_DIR, f"cpu_{n}_invert.png"))
+            Image.fromarray(gaussian_blur(img)).save(os.path.join(SAMPLES_DIR, f"cpu_{n}_gauss.png"))
+            Image.fromarray(equalize_histogram(img)).save(os.path.join(SAMPLES_DIR, f"cpu_{n}_equalize.png"))
+            count += 1
 
         h, w = img.shape
         total = t_inv + t_gaus + t_hist
