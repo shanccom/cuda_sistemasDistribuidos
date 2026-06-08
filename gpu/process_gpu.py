@@ -1,5 +1,5 @@
 """
-Procesamiento de imágenes médicas - GPU via CUDA / CuPy
+Procesamiento de imágenes médicas - GPU
 Operaciones: inversión, filtro gaussiano, ecualización de histograma
 """
 
@@ -22,7 +22,7 @@ RESULTS_DIR = os.path.join(os.path.dirname(__file__), "../results")
 REPETITIONS = 5
 
 
-# ─── Kernels GPU ─────────────────────────────────────────────────────────────
+# Kernels GPU
 
 def gpu_invert(gpu_img: cp.ndarray) -> cp.ndarray:
     """Inversión de píxeles sobre GPU."""
@@ -68,8 +68,7 @@ def measure_gpu(fn, gpu_img, reps=REPETITIONS):
 def warmup():
     """
     Calentamiento del contexto CUDA.
-    Sin esto, la primera operación real incluye la latencia de inicialización
-    del driver (~100–500 ms) y contamina las métricas.
+    Sin esto, la primera operación real incluye la latencia de inicialización del driver y contamina las métricas.
     """
     print("Calentando contexto CUDA...", end=" ", flush=True)
     dummy = cp.zeros((512, 512), dtype=cp.uint8)
